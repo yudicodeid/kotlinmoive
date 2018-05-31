@@ -5,11 +5,8 @@ class MovieModel {
     var ID:Int = 0
     var Title: String? = null
     var Overview: String? = null
-    var VoteAverage: Float = 0.0f
+    var VoteAverage: Double = 0.0
     var PosterPath: String? = null
 
-    init {
-
-    }
 
 }

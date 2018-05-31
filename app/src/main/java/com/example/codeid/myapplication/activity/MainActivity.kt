@@ -12,7 +12,7 @@ import com.example.codeid.myapplication.presenter.MoviesListPresenter
 
 class MainActivity : AppCompatActivity(), IMoviesListView {
 
-    private var presenter:IMoviesListPresenter? = null
+    var presenter:IMoviesListPresenter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -20,12 +20,14 @@ class MainActivity : AppCompatActivity(), IMoviesListView {
         setContentView(R.layout.activity_main)
 
         presenter = MoviesListPresenter(this)
+        presenter?.loadData()
 
     }
 
     override var gridview: RecyclerView
 
         get() = findViewById(R.id.rv_moviesList)
+
         set(value) {}
 
 

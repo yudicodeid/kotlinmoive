@@ -1,7 +1,6 @@
 package com.example.codeid.myapplication.api
 
 /*
-
 {
   "page": 1,
   "total_results": 19865,
@@ -26,9 +25,12 @@ package com.example.codeid.myapplication.api
       "adult": false,
       "overview": "Wisecracking mercenary Deadpool battles the evil and powerful Cable and other bad guys to save a boy's life.",
       "release_date": "2018-05-15"
-    },
+    }
 
  */
-data class TheMovieDbResult(val page:Int, val total_results:Int, val total_pages:Int, val result:List<TheMovieDbOrgEnt>)
 
-data class TheMovieDbOrgEnt(val id:Int, val title: String?, val vote_average: Float, val poster_path: String?)
+data class MovieApiModel(val id:Int,
+                         val title: String?,
+                         val overview: String?,
+                         val vote_average: Double,
+                         val poster_path: String?)

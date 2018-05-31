@@ -1,27 +1,57 @@
 package com.example.codeid.myapplication.api
 
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
+import java.util.*
 
-interface IMovieApi {
 
-    fun getPopularList(page: Int)
+class MovieApi : IMovieApi, Observer {
 
-    fun getTopRated(page: Int)
 
-}
+    private val apiKey: String = "dab5969b9d2d0c83940b0a6de8af87a3"
 
-class MovieApiFactory {
+    private val baseUrl: String = "https://api.themoviedb.org/3"
 
-    companion object {
+    private var listener: IMovieApiListener? = null
 
-        fun createApi(): IMovieApi {
-            return TheMovieDbOrgApi()
-        }
+
+    fun makeRequest(url: String, requestType: RequestType) {
+
+        val fullUrl = baseUrl + url
+        var request = Request(fullUrl, RequestType.POPULAR_LIST)
+        var response = Response()
+        response.addObserver(this)
+
+
+        val connection = ConnectionAsyncTask()
+        connection.response = Response()
+        connection.execute(request)
 
     }
-}
 
+
+    override fun getPopularList(page: Int) {
+
+        var url = "/movie/popular?api_key=" + apiKey
+
+        makeRequest(url, RequestType.POPULAR_LIST)
+    }
+
+    override fun getTopRated(page: Int) {
+    }
+
+    override fun update(p0: Observable?, p1: Any?) {
+
+        var response: Response = p0 as Response
+
+        var listMovies = ResponseParser.parse(response.result)
+
+        listener?.onListDataPop(listMovies)
+
+    }
+
+    override fun setMovieApiListener(listener: IMovieApiListener) {
+
+        this.listener = listener
+
+    }
+
+}
