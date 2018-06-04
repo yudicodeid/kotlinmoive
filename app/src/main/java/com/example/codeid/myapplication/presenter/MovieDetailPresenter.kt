@@ -8,13 +8,14 @@ class MovieDetailPresenter(val view:IMovieDetailView) : IMovieDetailPresenter {
 
     override fun loadMovieData(movieModel: MovieModel) {
 
+        view.loading()
+
         view.ratingValue = movieModel.voteAverage
-
         view.movieOverview = movieModel.overview
-
         view.movieTitle = movieModel.title
-
         view.poster = movieModel.posterPath
+
+        view.unloading()
     }
 
     override fun getBaseImgPath(): String {

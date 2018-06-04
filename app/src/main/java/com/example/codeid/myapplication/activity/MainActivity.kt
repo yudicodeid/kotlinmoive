@@ -1,5 +1,6 @@
 package com.example.codeid.myapplication.activity
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.opengl.Visibility
 import android.os.Bundle
@@ -9,19 +10,21 @@ import android.support.v7.widget.RecyclerView
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ProgressBar
 import com.example.codeid.myapplication.R
 import com.example.codeid.myapplication.model.MovieModel
 import com.example.codeid.myapplication.presenter.IMoviesListPresenter
 import com.example.codeid.myapplication.presenter.MoviesListPresenter
 import com.example.codeid.myapplication.view.IMoviesListView
 import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.anko.indeterminateProgressDialog
 
 class MainActivity : AppCompatActivity(), IMoviesListView {
 
     private lateinit var presenter:IMoviesListPresenter
 
     private lateinit var gridLayoutManager: GridLayoutManager
+
+    private lateinit var progressDialog: ProgressDialog
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,10 +94,11 @@ class MainActivity : AppCompatActivity(), IMoviesListView {
     }
 
     override fun loading() {
-        progressBar1.visibility = View.VISIBLE
+        progressDialog = ProgressDialog.show(this, "", "Please wait", true)
+
     }
 
     override fun unloading() {
-        progressBar1.visibility = View.GONE
+        progressDialog.hide()
     }
 }

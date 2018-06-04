@@ -48,7 +48,11 @@ class MoviesListPresenter(pContext: Context,
     }
 
     override fun loadTopRated() {
+
+        view.loading()
+
         domain.loadTopRated(1)
+        
     }
 
     override fun loadPopular() {

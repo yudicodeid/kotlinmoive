@@ -1,5 +1,6 @@
 package com.example.codeid.myapplication.activity
 
+import android.app.ProgressDialog
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.example.codeid.myapplication.R
@@ -16,7 +17,8 @@ class MovieDetailsActivity : AppCompatActivity(), IMovieDetailView {
         const val MOVIE = "MOVIE"
     }
 
-    lateinit var presenter: IMovieDetailPresenter
+    private lateinit var presenter: IMovieDetailPresenter
+    private lateinit var progressDialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -34,7 +36,6 @@ class MovieDetailsActivity : AppCompatActivity(), IMovieDetailView {
     }
 
     private var _ratingValue:Float = 0.0f
-
     override var ratingValue: Float
         get() = _ratingValue
         set(value) {
@@ -57,8 +58,8 @@ class MovieDetailsActivity : AppCompatActivity(), IMovieDetailView {
             movie_overview.text = value
         }
 
-    private lateinit var _poster:String
 
+    private lateinit var _poster:String
     override var poster: String
 
         get() = _poster
@@ -69,4 +70,13 @@ class MovieDetailsActivity : AppCompatActivity(), IMovieDetailView {
         }
 
 
+
+    override fun loading() {
+        progressDialog = ProgressDialog.show(this, "", "Please wait", true)
+
+    }
+
+    override fun unloading() {
+        progressDialog.hide()
+    }
 }

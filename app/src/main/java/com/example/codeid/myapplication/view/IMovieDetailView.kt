@@ -10,4 +10,8 @@ interface IMovieDetailView {
 
     var poster: String
 
+
+    fun loading()
+
+    fun unloading()
 }
