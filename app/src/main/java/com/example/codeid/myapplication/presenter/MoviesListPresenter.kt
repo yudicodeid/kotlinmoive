@@ -5,6 +5,7 @@ import android.support.v7.widget.GridLayoutManager
 import com.example.codeid.myapplication.adapter.MovieListAdapter
 import com.example.codeid.myapplication.domain.IMovieDomain
 import com.example.codeid.myapplication.domain.IMovieDomainListener
+import com.example.codeid.myapplication.domain.MovieDomain
 import com.example.codeid.myapplication.domain.MovieDomainFactory
 import com.example.codeid.myapplication.model.MovieModel
 import com.example.codeid.myapplication.view.IMoviesListView
@@ -19,29 +20,47 @@ class MoviesListPresenter(pContext: Context,
 
     private  val context: Context = pContext
     private val view: IMoviesListView = pView
-    private var domain: IMovieDomain? =  null
+    private var domain: IMovieDomain = MovieDomainFactory.createMovieDomain()
     private var listData: MutableList<MovieModel> = ArrayList()
 
     init {
-        view.gridview.adapter = MovieListAdapter(context, view.itemLayout, listData)
-        domain = MovieDomainFactory.createMovieDomain()
-        domain?.setMovieDomainListener(this)
+
+        domain.setMovieDomainListener(this)
 
     }
+
+
+    override fun onMovieSelected(movieModel: MovieModel) {
+        view.startDetailsView(movieModel)
+    }
+
 
     override fun onListDataUpdated(data: List<MovieModel>) {
 
         listData = data as MutableList<MovieModel>
+        view.gridview.adapter = MovieListAdapter(context,
+                view.itemLayout,
+                listData,
+                this)
 
-        view.gridview.adapter = MovieListAdapter(context, view.itemLayout, listData)
+        view.unloading()
 
     }
 
-    override fun loadData() {
-        domain?.loadPopularList(1)
+    override fun loadTopRated() {
+        domain.loadTopRated(1)
     }
 
-    override fun onItemSelectedListener() {
+    override fun loadPopular() {
+
+        view.loading()
+
+        domain.loadPopularList(1)
+
+    }
+
+    override fun getBaseImgPath(): String {
+        return MovieDomain.getBaseImgPath()
     }
 
 

@@ -32,10 +32,16 @@ class MovieApi : IMovieApi, Observer {
 
         var url = "/movie/popular?api_key=" + apiKey
 
+
         makeRequest(url, RequestType.POPULAR_LIST)
     }
 
     override fun getTopRated(page: Int) {
+
+        var url = "/movie/top_rated?api_key=" + apiKey
+
+        makeRequest(url, RequestType.TOP_RATED)
+
     }
 
     override fun update(p0: Observable?, p1: Any?) {

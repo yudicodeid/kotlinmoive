@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Movies</string>
+    <string name="title_activity_movie_details">MovieDetailsActivity</string>
+    <string name="buy_ticket">Buy Ticket</string>
+    <string name="dummy_overview">...</string>
+    <string name="dummy_title">...</string>
+    <string name="dummy_rating">.</string>
+
 </resources>

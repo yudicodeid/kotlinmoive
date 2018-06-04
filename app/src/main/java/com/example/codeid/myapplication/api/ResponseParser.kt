@@ -26,14 +26,19 @@ class ResponseParser  {
                     var result = results.getJSONObject(i)
 
 
+                    var dVoteAvg = result.getDouble("vote_average")
+                    var fVoteAvg = dVoteAvg.toFloat()
+
 
                     var ent = MovieApiModel( result.getInt("id"),
                             result.getString("title"),
                             result.getString("overview"),
-                            result.getDouble("vote_average"),
+                            fVoteAvg,
                             result.getString("poster_path") )
 
+
                     list.add(ent)
+
 
                 }
 

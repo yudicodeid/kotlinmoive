@@ -30,7 +30,7 @@ package com.example.codeid.myapplication.api
  */
 
 data class MovieApiModel(val id:Int,
-                         val title: String?,
-                         val overview: String?,
-                         val vote_average: Double,
-                         val poster_path: String?)
+                         val title: String,
+                         val overview: String,
+                         val vote_average: Float,
+                         val poster_path: String)

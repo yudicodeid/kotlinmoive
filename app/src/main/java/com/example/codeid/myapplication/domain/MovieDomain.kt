@@ -27,31 +27,42 @@ class MovieDomainFactory {
 
 class MovieDomain : Observable, IMovieDomain, IMovieApiListener {
 
-    private var movieApi: IMovieApi?= null
+    private lateinit var movieApi: IMovieApi
     private var listData: MutableList<MovieModel> = ArrayList()
-    private var listener: IMovieDomainListener? = null
+    private lateinit var listener: IMovieDomainListener
+
+    companion object {
+
+        fun getBaseImgPath(): String {
+            return "https://image.tmdb.org/t/p/w185_and_h278_bestv2/"
+        }
+    }
+
 
     constructor() {
 
         movieApi = MovieApiFactory.createApi()
-        movieApi?.setMovieApiListener(this)
+        movieApi.setMovieApiListener(this)
+
     }
 
     override fun setMovieDomainListener(listener: IMovieDomainListener) {
+
         this.listener = listener
+
     }
 
     override fun onListDataPop(list: List<MovieApiModel>) {
 
-
+        listData.clear()
         for( model:MovieApiModel in list) {
 
             var movieModel = MovieModel()
-            movieModel.ID = model.id
-            movieModel.Title = model.title
-            movieModel.Overview = model.overview
-            movieModel.PosterPath = model.poster_path
-            movieModel.VoteAverage = model.vote_average
+            movieModel.id = model.id
+            movieModel.title = model.title
+            movieModel.overview = model.overview
+            movieModel.posterPath = model.poster_path
+            movieModel.voteAverage = model.vote_average
 
             listData.add(movieModel)
 
@@ -62,15 +73,11 @@ class MovieDomain : Observable, IMovieDomain, IMovieApiListener {
     }
 
     override fun loadPopularList(page: Int) {
-        this.movieApi?.getPopularList(1)
+        this.movieApi.getPopularList(page)
     }
 
     override fun loadTopRated(page: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun loadDetails(id: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        this.movieApi.getTopRated(page)
     }
 
 

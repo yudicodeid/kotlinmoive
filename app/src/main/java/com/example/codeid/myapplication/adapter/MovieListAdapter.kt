@@ -5,15 +5,17 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.codeid.myapplication.R
 import com.example.codeid.myapplication.model.MovieModel
+import com.example.codeid.myapplication.presenter.IMoviesListPresenter
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.movie_adapter.view.*
 
 
+
 class MovieListAdapter(val context: Context,
         val layout: Int,
-        private val items: List<MovieModel>) : RecyclerView.Adapter<MovieViewHolder>() {
+        val items: List<MovieModel>,
+        val presenter: IMoviesListPresenter) : RecyclerView.Adapter<MovieViewHolder>() {
 
 
     override fun getItemCount(): Int {
@@ -26,21 +28,22 @@ class MovieListAdapter(val context: Context,
     }
 
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
-        holder.bind(items[position], position)
+        holder.bind(items[position], position, presenter)
     }
+
 }
+
 
 class MovieViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-    val baseImgPath = "https://image.tmdb.org/t/p/w185_and_h278_bestv2/"
 
-    fun bind(model: MovieModel, position: Int) {
+    fun bind(model: MovieModel, position: Int, presenter: IMoviesListPresenter) {
 
-        itemView.movie_title.text = model.Title
+        itemView.movie_title.text = model.title
 
-        Picasso.get().load(baseImgPath + model.PosterPath).into(itemView.movie_poster)
+        Picasso.get().load(presenter.getBaseImgPath() + model.posterPath).into(itemView.movie_poster)
 
-        //itemView.setOnClickListener{ listener.onItemClick(android) }
+        itemView.setOnClickListener{ presenter.onMovieSelected(model) }
     }
 
 }

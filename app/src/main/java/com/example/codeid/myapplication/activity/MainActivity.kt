@@ -1,23 +1,25 @@
 package com.example.codeid.myapplication.activity
 
-import android.support.v7.app.AppCompatActivity
+import android.content.Intent
+import android.opengl.Visibility
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.widget.GridView
-import android.widget.TextView
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import com.example.codeid.myapplication.R
-import com.example.codeid.myapplication.view.IMoviesListView
+import com.example.codeid.myapplication.model.MovieModel
 import com.example.codeid.myapplication.presenter.IMoviesListPresenter
 import com.example.codeid.myapplication.presenter.MoviesListPresenter
+import com.example.codeid.myapplication.view.IMoviesListView
 import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.indeterminateProgressDialog
 
 class MainActivity : AppCompatActivity(), IMoviesListView {
 
-    var presenter:IMoviesListPresenter? = null
-
-    //private lateinit var linearLayoutManager:LinearLayoutManager
+    private lateinit var presenter:IMoviesListPresenter
 
     private lateinit var gridLayoutManager: GridLayoutManager
 
@@ -25,20 +27,46 @@ class MainActivity : AppCompatActivity(), IMoviesListView {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
 
-        //linearLayoutManager = LinearLayoutManager(this)
-
         gridLayoutManager = GridLayoutManager(this,2)
-
-        //rv_moviesList.layoutManager = linearLayoutManager
 
         rv_moviesList.layoutManager = gridLayoutManager
 
         presenter = MoviesListPresenter(this.applicationContext, this)
 
-        presenter?.loadData()
+        presenter.loadPopular()
 
+    }
+
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+
+        val inflater = menuInflater
+
+        inflater.inflate(R.menu.options_menu, menu)
+
+        return super.onCreateOptionsMenu(menu)
+
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item!!.itemId) {
+
+            R.id.menu_popular -> {
+                presenter.loadPopular()
+                return true
+            }
+
+            R.id.menu_top_rated -> {
+                presenter.loadTopRated()
+                return true
+            }
+
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override var gridview: RecyclerView
@@ -53,4 +81,20 @@ class MainActivity : AppCompatActivity(), IMoviesListView {
         get() = R.layout.movie_adapter
         set(value) {}
 
+
+    override fun startDetailsView(movieModel: MovieModel) {
+
+        var intent = Intent(applicationContext, MovieDetailsActivity::class.java)
+        intent.putExtra(MovieDetailsActivity.MOVIE, movieModel)
+        startActivity(intent)
+
+    }
+
+    override fun loading() {
+        progressBar1.visibility = View.VISIBLE
+    }
+
+    override fun unloading() {
+        progressBar1.visibility = View.GONE
+    }
 }

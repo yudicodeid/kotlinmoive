@@ -1,12 +1,13 @@
 package com.example.codeid.myapplication.model
 
-class MovieModel {
+import java.io.Serializable
 
-    var ID:Int = 0
-    var Title: String? = null
-    var Overview: String? = null
-    var VoteAverage: Double = 0.0
-    var PosterPath: String? = null
+class MovieModel : Serializable{
 
+    var id:Int = 0
+    var title: String = ""
+    var overview: String = ""
+    var voteAverage: Float = 0.0f
+    var posterPath: String = ""
 
 }

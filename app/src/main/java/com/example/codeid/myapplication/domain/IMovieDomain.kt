@@ -6,8 +6,6 @@ interface IMovieDomain {
 
     fun loadTopRated(page:Int)
 
-    fun loadDetails(id: Int)
-
     fun setMovieDomainListener(listener: IMovieDomainListener)
 
 
