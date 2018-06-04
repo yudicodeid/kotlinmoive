@@ -5,7 +5,6 @@ import java.util.*
 
 class MovieApi : IMovieApi, Observer {
 
-
     private val apiKey: String = "dab5969b9d2d0c83940b0a6de8af87a3"
 
     private val baseUrl: String = "https://api.themoviedb.org/3"
@@ -16,17 +15,18 @@ class MovieApi : IMovieApi, Observer {
     fun makeRequest(url: String, requestType: RequestType) {
 
         val fullUrl = baseUrl + url
+
         var request = Request(fullUrl, RequestType.POPULAR_LIST)
+
         var response = Response()
+
         response.addObserver(this)
 
+        val connection = ConnectionAsyncTask(request, response)
 
-        val connection = ConnectionAsyncTask()
-        connection.response = Response()
-        connection.execute(request)
+        connection.execute("")
 
     }
-
 
     override fun getPopularList(page: Int) {
 

@@ -25,8 +25,11 @@ class ResponseParser  {
 
                     var result = results.getJSONObject(i)
 
+
+
                     var ent = MovieApiModel( result.getInt("id"),
                             result.getString("title"),
+                            result.getString("overview"),
                             result.getDouble("vote_average"),
                             result.getString("poster_path") )
 

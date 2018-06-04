@@ -7,4 +7,6 @@ interface IMoviesListView {
 
     var gridview: RecyclerView
 
+    var itemLayout: Int
+
 }

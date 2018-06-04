@@ -9,24 +9,26 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 
-class ConnectionAsyncTask : AsyncTask<Request, String, String>() {
+class ConnectionAsyncTask(
+        request: Request,
+        response: Response) : AsyncTask<String, String, String>() {
 
     val CONNECTON_TIMEOUT_MILLISECONDS = 60000
 
-    var response: Response = Response()
+    var response: Response = response
 
-    var request: Request? =  null
+    val request: Request? =  request
+
 
 
     override fun onPreExecute() { }
 
-    override fun doInBackground(vararg requests: Request?): String {
+    override fun doInBackground(vararg requests: String): String {
 
         var urlConnection: HttpURLConnection? = null
 
         try {
 
-            request = requests[0]
             val url = URL(request?.url)
 
             urlConnection = url.openConnection() as HttpURLConnection
@@ -61,6 +63,7 @@ class ConnectionAsyncTask : AsyncTask<Request, String, String>() {
             response?.notifyObservers()
 
         } catch (ex: Exception) {
+            ex.printStackTrace()
         }
 
     }

@@ -16,6 +16,11 @@ class ResponseObserver : Observer {
 
 class Response : Observable() {
 
+    override fun notifyObservers() {
+        setChanged()
+        super.notifyObservers()
+    }
+
     var result: String? = null
     var requestType: RequestType = RequestType.NONE
 

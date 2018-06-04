@@ -7,10 +7,12 @@
     android:layout_height="match_parent"
     tools:context="com.example.codeid.myapplication.activity.MainActivity">
 
-    <android.support.v7.widget.RecyclerView
 
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_moviesList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"/>
+
 
 </android.support.constraint.ConstraintLayout>

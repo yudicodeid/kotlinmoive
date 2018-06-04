@@ -7,11 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.codeid.myapplication.R
 import com.example.codeid.myapplication.model.MovieModel
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.movie_adapter.view.*
 
 
-class MovieListAdapter(
-        val context: Context,
+class MovieListAdapter(val context: Context,
+        val layout: Int,
         private val items: List<MovieModel>) : RecyclerView.Adapter<MovieViewHolder>() {
 
 
@@ -20,7 +21,8 @@ class MovieListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): MovieViewHolder {
-        return MovieViewHolder(LayoutInflater.from(context).inflate(R.layout.movie_adapter, parent, false))
+
+        return MovieViewHolder(LayoutInflater.from(context).inflate(layout, parent, false))
     }
 
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
@@ -30,9 +32,14 @@ class MovieListAdapter(
 
 class MovieViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
+    val baseImgPath = "https://image.tmdb.org/t/p/w185_and_h278_bestv2/"
+
     fun bind(model: MovieModel, position: Int) {
-        //itemView.movie_poster = model.Title
+
         itemView.movie_title.text = model.Title
+
+        Picasso.get().load(baseImgPath + model.PosterPath).into(itemView.movie_poster)
+
         //itemView.setOnClickListener{ listener.onItemClick(android) }
     }
 
