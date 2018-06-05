@@ -60,11 +60,11 @@ class ConnectionAsyncTask(
 
             Log.d("RESPONSE", res)
 
-            response?.result = res
+            response.result = res
 
-            response?.requestType = request!!.requestType
+            response.requestType = request!!.requestType
 
-            response?.notifyObservers()
+            response.notifyObservers()
 
         } catch (ex: Exception) {
             ex.printStackTrace()
@@ -79,7 +79,7 @@ class ConnectionAsyncTask(
     fun streamToString(inputStream: InputStream): String {
 
         val bufferReader = BufferedReader(InputStreamReader(inputStream))
-        var line: String
+        var line: String?= null
         var result = ""
 
         try {

@@ -16,7 +16,7 @@ class MovieApi : IMovieApi, Observer {
 
         val fullUrl = baseUrl + url
 
-        var request = Request(fullUrl, RequestType.POPULAR_LIST)
+        var request = Request(fullUrl, requestType)
 
         var response = Response()
 
@@ -50,7 +50,7 @@ class MovieApi : IMovieApi, Observer {
 
         var listMovies = ResponseParser.parse(response.result)
 
-        listener?.onListDataPop(listMovies)
+        listener?.onListDataPop(listMovies, response.requestType)
 
     }
 

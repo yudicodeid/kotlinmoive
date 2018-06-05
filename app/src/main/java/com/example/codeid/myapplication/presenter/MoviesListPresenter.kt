@@ -13,27 +13,21 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class MoviesListPresenter(pContext: Context,
-                          pView: IMoviesListView) :
+class MoviesListPresenter(val context: Context,
+                          val view: IMoviesListView) :
         IMoviesListPresenter, IMovieDomainListener {
 
 
-    private  val context: Context = pContext
-    private val view: IMoviesListView = pView
-    private var domain: IMovieDomain = MovieDomainFactory.createMovieDomain()
-    private var listData: MutableList<MovieModel> = ArrayList()
+    private var domain: IMovieDomain = MovieDomainFactory.createMovieDomain(context)
+    private var listData: MutableList<MovieModel> = ArrayList<MovieModel>()
 
     init {
-
         domain.setMovieDomainListener(this)
-
     }
-
 
     override fun onMovieSelected(movieModel: MovieModel) {
         view.startDetailsView(movieModel)
     }
-
 
     override fun onListDataUpdated(data: List<MovieModel>) {
 

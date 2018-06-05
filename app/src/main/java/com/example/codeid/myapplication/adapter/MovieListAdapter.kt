@@ -28,7 +28,7 @@ class MovieListAdapter(val context: Context,
     }
 
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
-        holder.bind(items[position], position, presenter)
+        holder.bind(items[position], presenter)
     }
 
 }
@@ -37,7 +37,7 @@ class MovieListAdapter(val context: Context,
 class MovieViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
 
-    fun bind(model: MovieModel, position: Int, presenter: IMoviesListPresenter) {
+    fun bind(model: MovieModel, presenter: IMoviesListPresenter) {
 
         itemView.movie_title.text = model.title
 

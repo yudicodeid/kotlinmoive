@@ -1,5 +1,6 @@
 package com.example.codeid.myapplication.domain
 
+import com.example.codeid.myapplication.api.RequestType
 import com.example.codeid.myapplication.model.MovieModel
 
 interface IMovieDomainListener {
