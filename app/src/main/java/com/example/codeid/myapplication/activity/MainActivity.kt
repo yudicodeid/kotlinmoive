@@ -1,7 +1,11 @@
 package com.example.codeid.myapplication.activity
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.opengl.Visibility
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -14,11 +18,13 @@ import android.widget.ProgressBar
 import com.example.codeid.myapplication.R
 import com.example.codeid.myapplication.model.MovieModel
 import com.example.codeid.myapplication.presenter.IMoviesListPresenter
+import com.example.codeid.myapplication.presenter.ListMode
 import com.example.codeid.myapplication.presenter.MoviesListPresenter
 import com.example.codeid.myapplication.view.IMoviesListView
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), IMoviesListView {
+
+class MainActivity : AppCompatActivity(), IMoviesListView, ConnectivityReceiver.ConnectivityReceiverListener {
 
     private lateinit var presenter:IMoviesListPresenter
 
@@ -33,16 +39,47 @@ class MainActivity : AppCompatActivity(), IMoviesListView {
 
         setContentView(R.layout.activity_main)
 
+        presenter = MoviesListPresenter(this.applicationContext, this)
+
+        presenter.setupConnectivityListener()
+
+        presenter.isInternetConnected = isInternetOn()
+
+        presenter.setupListView()
+
+        presenter.loadListData()
+
+    }
+
+
+
+    override fun setupListView() {
+
         gridLayoutManager = GridLayoutManager(this,2)
 
         rv_moviesList.layoutManager = gridLayoutManager
 
-        presenter = MoviesListPresenter(this.applicationContext, this)
+    }
 
-        presenter.loadPopular()
+
+    override fun setConnectivityListener() {
+
+        var connectivityReceiver = ConnectivityReceiver()
+
+        ConnectivityReceiver.listener = this
+
+        registerReceiver(connectivityReceiver,
+                IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+
 
     }
 
+    private fun isInternetOn() : Boolean {
+
+        val connMgr = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connMgr.activeNetworkInfo
+        return networkInfo != null && networkInfo.isConnectedOrConnecting
+    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
 
@@ -56,21 +93,24 @@ class MainActivity : AppCompatActivity(), IMoviesListView {
 
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+
         when(item!!.itemId) {
 
             R.id.menu_popular -> {
-                presenter.loadPopular()
+                presenter.changeListMode(ListMode.POPULAR_LIST)
                 return true
             }
 
             R.id.menu_top_rated -> {
-                presenter.loadTopRated()
+                presenter.changeListMode(ListMode.TOP_RATED)
                 return true
             }
 
         }
         return super.onOptionsItemSelected(item)
     }
+
+
 
     override var gridview: RecyclerView
 
@@ -101,4 +141,23 @@ class MainActivity : AppCompatActivity(), IMoviesListView {
     override fun unloading() {
         progressDialog.hide()
     }
+
+    override fun onNetworkConnectionChanged(isConnected: Boolean) {
+        presenter.updateConnectionStatus(isConnected)
+    }
+
+    override fun showAlertNetworkError() {
+
+        val builder = AlertDialog.Builder(this@MainActivity)
+        builder.setTitle("Network Error")
+        builder.setMessage("Network Error")
+        // Display a neutral button on alert dialog
+        builder.setNeutralButton("OK"){_,_ ->
+        }
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
+    }
+
+
 }

@@ -20,14 +20,37 @@ class MoviesListPresenter(val context: Context,
 
     private var domain: IMovieDomain = MovieDomainFactory.createMovieDomain(context)
     private var listData: MutableList<MovieModel> = ArrayList<MovieModel>()
+    private var _isInternetConnected : Boolean = false
+    private var firstLoaded : Int = 0
+    private var isLoading : Boolean = false
+
+
+    override var isInternetConnected: Boolean
+        get() = _isInternetConnected
+        set(value) {
+            _isInternetConnected = value
+        }
+
+    private var currListMode: ListMode = ListMode.POPULAR_LIST
+
 
     init {
         domain.setMovieDomainListener(this)
     }
 
+
+
+    override fun setupListView() {
+        view.setupListView()
+    }
+    override fun setupConnectivityListener() {
+        view.setConnectivityListener()
+    }
+
     override fun onMovieSelected(movieModel: MovieModel) {
         view.startDetailsView(movieModel)
     }
+
 
     override fun onListDataUpdated(data: List<MovieModel>) {
 
@@ -39,21 +62,28 @@ class MoviesListPresenter(val context: Context,
 
         view.unloading()
 
+        isLoading = false
+
     }
 
-    override fun loadTopRated() {
 
+    private var isCached : Boolean
+        get() = !isInternetConnected
+        set(value) {}
+
+
+    override fun loadListData() {
+
+        firstLoaded++
+        isLoading = true
         view.loading()
 
-        domain.loadTopRated(1)
-        
-    }
+        if (currListMode ==  ListMode.POPULAR_LIST) {
+            domain.loadPopularList(1, isCached)
 
-    override fun loadPopular() {
-
-        view.loading()
-
-        domain.loadPopularList(1)
+        } else if(currListMode == ListMode.TOP_RATED ) {
+            domain.loadTopRated(1, isCached)
+        }
 
     }
 
@@ -61,5 +91,22 @@ class MoviesListPresenter(val context: Context,
         return MovieDomain.getBaseImgPath()
     }
 
+    override fun updateConnectionStatus(isConnected: Boolean) {
 
+        if (!isConnected && !isInternetConnected) {
+            isInternetConnected = false
+            view.showAlertNetworkError()
+        } else {
+
+            if(firstLoaded>1 && !isLoading) {
+                loadListData()
+            }
+        }
+
+    }
+
+    override fun changeListMode(mode: ListMode) {
+        currListMode = mode
+        loadListData()
+    }
 }

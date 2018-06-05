@@ -1,6 +1,7 @@
 package com.example.codeid.myapplication.model
 
 import com.example.codeid.myapplication.api.MovieApiModel
+import com.example.codeid.myapplication.db.MovieTable
 import java.io.Serializable
 
 class MovieModel : Serializable{
@@ -18,6 +19,16 @@ class MovieModel : Serializable{
         overview = apiModel.overview
         posterPath = apiModel.poster_path
         voteAverage = apiModel.vote_average
+
+    }
+
+    fun mapFromTable(table: MovieTable) {
+
+        id = table.id
+        title = table.title
+        overview = table.overview
+        posterPath = table.posterPath
+        voteAverage =  table.ratingValue
 
     }
 

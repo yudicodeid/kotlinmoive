@@ -9,10 +9,16 @@ interface IMoviesListView {
 
     var itemLayout: Int
 
+    fun setupListView()
+
     fun startDetailsView(movieModel: MovieModel)
 
     fun loading()
 
     fun unloading()
+
+    fun showAlertNetworkError()
+
+    fun setConnectivityListener()
 
 }

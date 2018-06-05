@@ -6,15 +6,43 @@ import android.database.sqlite.SQLiteException
 import android.graphics.Movie
 
 
-class PopularMovieTable(val db:SQLiteDatabase) {
+class PopularMovieTable(val db:SQLiteDatabase): IMovieTable {
 
     var id:Int = 0
     var movieID: Int = 0
 
-    fun add() {
+    override fun find(): Boolean {
+        TODO("Unimplemented")
+    }
+
+    @Throws(Exception::class)
+    override fun findByMovieID(): Boolean {
+
+        if(movieID ==0) throw Exception("Invalid MovieID=0")
+
+        var sql = StringBuilder().apply {
+            appendln("SELECT $ID, $MOVIE_ID FROM ${PopularMovieTable.TABLE_NAME} WHERE movie_id=?")
+        }
+
+        var params = arrayOf(movieID.toString())
+
+        var c = db.rawQuery(sql.toString(), params)
+
+        if( c.moveToFirst()) {
+
+            id = c.getInt(0)
+            movieID = c.getInt(1)
+
+            return true
+        }
+
+        return false
+
+    }
+
+    override fun add() {
 
         val values = ContentValues()
-        values.put(ID, id)
         values.put(MOVIE_ID, movieID)
 
         db.insert(TABLE_NAME, null, values)
@@ -22,20 +50,19 @@ class PopularMovieTable(val db:SQLiteDatabase) {
     }
 
 
-    fun list() : List<MovieTable> {
+    override fun list() : List<MovieTable> {
 
         var listData: MutableList<MovieTable> = ArrayList()
 
         var sql = StringBuilder().apply {
             appendln("SELECT  b.id, b.title, b.poster_path, b.overview, b.rating_value")
             appendln(" FROM ${PopularMovieTable.TABLE_NAME} a ")
-            appendln(" INNER JOIN ${MovieTable.TABLE_NAME} b ON a.MovieID = b.id ")
+            appendln(" LEFT JOIN ${MovieTable.TABLE_NAME} b ON a.movie_id = b.id ")
             appendln(" ORDER BY a.id ASC ")
         }
 
-        var c = db.rawQuery(sql.toString(), null)
-        db.close()
 
+        var c = db.rawQuery(sql.toString(), null)
         while (c.moveToNext()) {
 
             var movie = MovieTable()
@@ -51,12 +78,13 @@ class PopularMovieTable(val db:SQLiteDatabase) {
             listData.add(movie)
         }
 
+
         return listData
 
     }
 
     @Throws(SQLiteException::class)
-    fun truncate() {
+    override fun truncate() {
 
         var sql = StringBuilder().apply {
             appendln("DELETE FROM $TABLE_NAME;")

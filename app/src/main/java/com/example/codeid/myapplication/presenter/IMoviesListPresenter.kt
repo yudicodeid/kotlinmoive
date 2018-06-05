@@ -4,12 +4,19 @@ import com.example.codeid.myapplication.model.MovieModel
 
 interface IMoviesListPresenter {
 
-    fun loadPopular()
+    var isInternetConnected: Boolean
 
-    fun loadTopRated()
+    fun setupListView()
+
+    fun setupConnectivityListener()
+
+    fun loadListData()
 
     fun onMovieSelected(movieModel: MovieModel)
 
     fun getBaseImgPath():String
 
+    fun updateConnectionStatus(isConnection: Boolean)
+
+    fun changeListMode(mode: ListMode)
 }

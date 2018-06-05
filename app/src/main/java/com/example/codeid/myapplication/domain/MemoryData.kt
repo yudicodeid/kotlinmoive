@@ -1,12 +1,17 @@
 package com.example.codeid.myapplication.domain
 
 import com.example.codeid.myapplication.api.MovieApiModel
+import com.example.codeid.myapplication.db.MovieTable
 import com.example.codeid.myapplication.model.MovieModel
 import java.util.ArrayList
 
 class MemoryData {
 
     var data: MutableList<MovieModel> = ArrayList()
+
+    fun clearCache() {
+        data.clear()
+    }
 
     fun updateData(apiModelList: List<MovieApiModel>) {
 
@@ -29,6 +34,27 @@ class MemoryData {
             }
         }
     }
+
+
+
+    fun updateFromLocal(listMovieTable: List<MovieTable>) {
+
+        var copy = data.toMutableList()
+        var sorted = sortMovieModelList(copy)
+
+        for(table: MovieTable in  listMovieTable) {
+
+            var found = binarySearch(sorted, table.id)
+
+            if (found == null) {
+                var movieModel = MovieModel()
+                movieModel.mapFromTable(table)
+                data.add(movieModel)
+            }
+
+        }
+    }
+
 
     protected fun sortMovieModelList(items:List<MovieModel>):List<MovieModel>{
         if (items.count() < 2){

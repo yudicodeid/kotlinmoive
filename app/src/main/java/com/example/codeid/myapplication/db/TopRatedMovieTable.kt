@@ -5,12 +5,13 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 
 
-class TopRatedMovieTable (val db: SQLiteDatabase) {
+class TopRatedMovieTable (val db: SQLiteDatabase): IMovieTable {
 
     var id:Int =0
     var movieID:Int = 0
 
-    fun truncate() {
+    @Throws(Exception::class)
+    override fun truncate() {
 
         var sql = StringBuilder().apply {
             appendln("DELETE FROM $TABLE_NAME;")
@@ -25,10 +26,34 @@ class TopRatedMovieTable (val db: SQLiteDatabase) {
     }
 
 
-    fun add() {
+
+    @Throws(Exception::class)
+    override fun findByMovieID(): Boolean {
+
+        if(movieID ==0) throw Exception("Invalid MovieID=0")
+
+        var sql = StringBuilder().apply {
+            appendln("SELECT $ID, $MOVIE_ID FROM ${TopRatedMovieTable.TABLE_NAME} WHERE movie_id=?")
+        }
+
+        var params = arrayOf(movieID.toString())
+        var c = db.rawQuery(sql.toString(), params)
+
+        if( c.moveToFirst()) {
+
+            id = c.getInt(0)
+            movieID = c.getInt(1)
+
+            return true
+        }
+
+        return false
+
+    }
+
+    override fun add() {
 
         val values = ContentValues()
-        values.put(TopRatedMovieTable.ID, id)
         values.put(TopRatedMovieTable.MOVIE_ID, movieID)
 
         try {
@@ -40,21 +65,22 @@ class TopRatedMovieTable (val db: SQLiteDatabase) {
         }
     }
 
+    override fun find(): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
-    fun list() : List<MovieTable> {
+    override fun list() : List<MovieTable> {
 
         var listData: MutableList<MovieTable> = ArrayList()
 
         var sql = StringBuilder().apply {
             appendln("SELECT  b.id, b.title, b.poster_path, b.overview, b.rating_value")
             appendln(" FROM ${TopRatedMovieTable.TABLE_NAME} a ")
-            appendln(" INNER JOIN ${MovieTable.TABLE_NAME} b ON a.MovieID = b.id ")
+            appendln(" INNER JOIN ${MovieTable.TABLE_NAME} b ON a.movie_id = b.id ")
             appendln(" ORDER BY a.id ASC ")
         }
 
         var c = db.rawQuery(sql.toString(), null)
-        db.close()
-
         while (c.moveToNext()) {
 
             var movie = MovieTable()

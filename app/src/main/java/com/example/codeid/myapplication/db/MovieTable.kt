@@ -4,7 +4,7 @@ import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 
-class MovieTable {
+class MovieTable: IMovieTable {
 
     constructor()
 
@@ -19,7 +19,11 @@ class MovieTable {
     var ratingValue:Float = 0.0f
     var overview:String = ""
 
-    fun find() : Boolean {
+    override fun findByMovieID(): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun find() : Boolean {
 
         if (id ==0)  throw Exception("Invalid id=0")
 
@@ -31,8 +35,6 @@ class MovieTable {
         }
 
         var c = db.rawQuery(sql.toString(), params)
-
-        //db.close()
 
         if (c.moveToFirst()) {
 
@@ -49,7 +51,7 @@ class MovieTable {
 
     }
 
-    fun add() {
+    override fun add() {
 
         val values = ContentValues()
         values.put(ID, id)
@@ -62,6 +64,13 @@ class MovieTable {
 
     }
 
+    override fun list(): List<MovieTable> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun truncate() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     companion object {
 

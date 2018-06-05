@@ -29,11 +29,14 @@ class MovieDomainFactory {
 
 class MovieDomain(private val context:Context): IMovieDomain, IMovieApiListener {
 
+
     private var movieApi: IMovieApi
 
-    private var popularMovieMemData: MemoryData = MemoryData()
-
-    private var topRatedMovieMemData: MemoryData = MemoryData()
+    private val popularMovieMemData: MemoryData = MemoryData()
+    private val topRatedMovieMemData: MemoryData = MemoryData()
+    private var movieDbCache : MovieDbCache
+    private var popularMovieDbCache : PopularMovieDbCache
+    private var topRatedMovieDbCache : TopRatedMovieDbCache
 
 
     private lateinit var listener: IMovieDomainListener
@@ -41,6 +44,8 @@ class MovieDomain(private val context:Context): IMovieDomain, IMovieApiListener 
     private var db:DbHelper
 
     companion object {
+
+        val TAG:String  = "MovieDomain"
 
         fun getBaseImgPath(): String {
             return "https://image.tmdb.org/t/p/w185_and_h278_bestv2/"
@@ -51,77 +56,17 @@ class MovieDomain(private val context:Context): IMovieDomain, IMovieApiListener 
 
         movieApi = MovieApiFactory.createApi()
         movieApi.setMovieApiListener(this)
+
         db = DbHelper(context)
+
+        movieDbCache = MovieDbCache(db)
+        popularMovieDbCache = PopularMovieDbCache(db)
+        topRatedMovieDbCache = TopRatedMovieDbCache(db)
 
     }
 
     override fun setMovieDomainListener(listener: IMovieDomainListener) {
         this.listener = listener
-    }
-
-
-    private fun insertPopularMovieTable(list: List<MovieApiModel>) {
-
-        var popular = PopularMovieTable(db.writableDatabase)
-        popular.truncate()
-
-        for( model:MovieApiModel in list) {
-
-            try {
-
-                val popularMovie = PopularMovieTable(db.writableDatabase)
-                popularMovie.movieID = model.id
-                popularMovie.add()
-
-            }catch(e:Exception) {
-                Log.e("MovieDomain", e.message)
-            }
-        }
-    }
-
-    private fun insertTopRatedMovieTable(list: List<MovieApiModel>) {
-
-        var topRated = TopRatedMovieTable(db.writableDatabase)
-        topRated.truncate()
-
-        for( model:MovieApiModel in list) {
-
-            try {
-
-                val topRated = TopRatedMovieTable(db.writableDatabase)
-                topRated.movieID = model.id
-                topRated.add()
-
-            }catch(e:Exception) {
-                Log.e("MovieDomain", e.message)
-            }
-        }
-    }
-
-    private fun insertIntoMovieTable(list: List<MovieApiModel>) {
-
-        for( model:MovieApiModel in list) {
-
-            var movie = MovieTable(db.readableDatabase)
-            movie.id = model.id
-
-            if (!movie.find()) {
-
-                movie = MovieTable(db.writableDatabase)
-                movie.id = model.id
-                movie.title = model.title
-                movie.posterPath = model.poster_path
-                movie.ratingValue = model.vote_average
-                movie.overview= model.overview
-
-                try {
-                    movie.add()
-                }catch(e:Exception) {
-                    Log.e("MovieDomain", e.message)
-                }
-            }
-
-        }
     }
 
 
@@ -132,49 +77,88 @@ class MovieDomain(private val context:Context): IMovieDomain, IMovieApiListener 
         try {
 
             writeDb = db.writableDatabase
+            movieDbCache.insertFromListApiModel(listApiModel)
 
-            var originalList = listApiModel.toMutableList()
-
-            insertIntoMovieTable(listApiModel)
 
             if (requestType == RequestType.POPULAR_LIST) {
 
-                insertPopularMovieTable(originalList)
-
+                popularMovieDbCache.insertFromListApiModel(listApiModel)
                 popularMovieMemData.updateData(listApiModel)
-
                 this.listener.onListDataUpdated(popularMovieMemData.data)
-
 
             }
             else if(requestType == RequestType.TOP_RATED) {
 
-                insertTopRatedMovieTable(originalList)
-
+                topRatedMovieDbCache.insertFromListApiModel(listApiModel)
                 topRatedMovieMemData.updateData(listApiModel)
-
                 this.listener.onListDataUpdated(topRatedMovieMemData.data)
 
             }
 
         }catch(e:Exception) {
+            Log.e(TAG, e.message)
         }finally {
             writeDb?.close()
         }
+    }
 
 
+    private fun loadPopularCache() {
+
+
+        try {
+
+            var listMovieTable = popularMovieDbCache.loadList()
+
+            popularMovieMemData.clearCache()
+
+            popularMovieMemData.updateFromLocal(listMovieTable)
+
+            this.listener.onListDataUpdated(popularMovieMemData.data)
+
+        }catch (e:Exception){
+            Log.e(TAG, e.message)
+        }
 
     }
 
-    override fun loadPopularList(page: Int) {
+    private fun loadTopRatedCache() {
 
-        this.movieApi.getPopularList(page)
+        try {
+
+            var listMovieTable = topRatedMovieDbCache.loadList()
+
+            topRatedMovieMemData.clearCache()
+
+            topRatedMovieMemData.updateFromLocal(listMovieTable)
+
+            this.listener.onListDataUpdated(topRatedMovieMemData.data)
+
+
+        }catch (e:Exception){
+            Log.e(TAG, e.message)
+        }
 
     }
 
-    override fun loadTopRated(page: Int) {
 
-        this.movieApi.getTopRated(page)
+    override fun loadPopularList(page: Int, cached:Boolean) {
+
+        if (!cached) {
+            this.movieApi.getPopularList(page)
+        } else {
+            loadPopularCache()
+        }
+
+    }
+
+    override fun loadTopRated(page: Int, cached:Boolean) {
+
+        if(!cached) {
+            this.movieApi.getTopRated(page)
+        } else {
+            loadTopRatedCache()
+        }
 
     }
 
