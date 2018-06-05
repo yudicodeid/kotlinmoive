@@ -31,9 +31,9 @@ class MovieDomain(private val context:Context): IMovieDomain, IMovieApiListener 
 
     private var movieApi: IMovieApi
 
-    private var popularMovieMemData: MutableList<MovieModel> = ArrayList()
+    private var popularMovieMemData: MemoryData = MemoryData()
 
-    private var topRatedMovieMemData: MutableList<MovieModel> = ArrayList()
+    private var topRatedMovieMemData: MemoryData = MemoryData()
 
 
     private lateinit var listener: IMovieDomainListener
@@ -58,6 +58,7 @@ class MovieDomain(private val context:Context): IMovieDomain, IMovieApiListener 
     override fun setMovieDomainListener(listener: IMovieDomainListener) {
         this.listener = listener
     }
+
 
     private fun insertPopularMovieTable(list: List<MovieApiModel>) {
 
@@ -124,106 +125,6 @@ class MovieDomain(private val context:Context): IMovieDomain, IMovieApiListener 
     }
 
 
-    private fun sortApiModelList(items:List<MovieApiModel>):List<MovieApiModel>{
-
-        if (items.count() < 2){
-            return items
-        }
-        val pivot = items[items.count()/2]
-
-        val equal = items.filter { it.id == pivot.id }
-        val less = items.filter { it.id < pivot.id }
-        val greater = items.filter { it.id > pivot.id }
-
-        return sortApiModelList(less) + equal + sortApiModelList(greater)
-
-    }
-
-
-    private fun sortMovieModelList(items:List<MovieModel>):List<MovieModel>{
-        if (items.count() < 2){
-            return items
-        }
-        val pivot = items[items.count()/2]
-
-        val equal = items.filter { it.id == pivot.id }
-        val less = items.filter { it.id < pivot.id }
-        val greater = items.filter { it.id > pivot.id }
-
-        return sortMovieModelList(less) + equal + sortMovieModelList(greater)
-
-    }
-
-
-
-    fun binarySearch(list: List<MovieModel>, key: Int): Int? {
-
-        var rangeStart = 0
-        var rangeEnd = list.count()
-
-        while (rangeStart < rangeEnd) {
-            val midIndex = rangeStart + (rangeEnd - rangeStart)/2
-            if (list[midIndex].id == key) {
-                return midIndex
-            } else if (list[midIndex].id < key) {
-                rangeStart = midIndex + 1
-            } else {
-                rangeEnd = midIndex
-            }
-        }
-
-        return null
-    }
-
-
-
-    private fun updatePopularMemData(apiModelList: List<MovieApiModel>) {
-
-        var copy = popularMovieMemData.toMutableList()
-
-        var sorted = sortMovieModelList(copy)
-
-        for(apiModel:MovieApiModel in apiModelList) {
-
-            var found = binarySearch(sorted, apiModel.id)
-
-            if (found == null) {
-
-                var movieModel = MovieModel()
-
-                movieModel.mapFromApiModel( apiModel)
-
-                popularMovieMemData.add(movieModel)
-
-            }
-        }
-    }
-
-
-
-
-    private fun updateTopRatedMemData(apiModelList: List<MovieApiModel>) {
-
-        var copy = topRatedMovieMemData.toMutableList()
-
-        var sorted = sortMovieModelList(copy)
-
-        for(apiModel:MovieApiModel in apiModelList) {
-
-            var found = binarySearch(sorted, apiModel.id)
-
-            if (found == null) {
-
-                var movieModel = MovieModel()
-
-                movieModel.mapFromApiModel( apiModel)
-
-                topRatedMovieMemData.add(movieModel)
-
-            }
-        }
-    }
-
     override fun onListDataPop(listApiModel: List<MovieApiModel>, requestType:RequestType) {
 
         var writeDb: SQLiteDatabase? = null
@@ -240,18 +141,19 @@ class MovieDomain(private val context:Context): IMovieDomain, IMovieApiListener 
 
                 insertPopularMovieTable(originalList)
 
-                updatePopularMemData(listApiModel)
+                popularMovieMemData.updateData(listApiModel)
 
-                this.listener.onListDataUpdated(popularMovieMemData)
+                this.listener.onListDataUpdated(popularMovieMemData.data)
+
 
             }
             else if(requestType == RequestType.TOP_RATED) {
 
                 insertTopRatedMovieTable(originalList)
 
-                updateTopRatedMemData(listApiModel)
+                topRatedMovieMemData.updateData(listApiModel)
 
-                this.listener.onListDataUpdated(topRatedMovieMemData)
+                this.listener.onListDataUpdated(topRatedMovieMemData.data)
 
             }
 
